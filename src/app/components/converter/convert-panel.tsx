@@ -8,7 +8,7 @@ import {
   Form,
   Row,
 } from 'react-bootstrap';
-import { getSymbols } from 'src/app/api/currency.api';
+import { convert, getSymbols } from 'src/app/api/currency.api';
 import { useCurrencyContext } from 'src/app/context/currency.context';
 
 function ConvertPanel() {
@@ -41,6 +41,19 @@ function ConvertPanel() {
     });
   };
 
+  const onConvert = () => {
+    convert(state.currencyFrom, state.currencyTo, state.amount as number)
+      .then((res) => {
+        dispatch({
+          type: 'SET_CONVERTED_AMOUNT',
+          payload: res.result,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     getSymbols()
       .then((res) => {
@@ -57,7 +70,7 @@ function ConvertPanel() {
       .catch((err) => {
         console.log(err);
       });
-  });
+  }, [dispatch]);
 
   return (
     <section className="sticky-top bg-white py-5" style={{ top: '79px' }}>
@@ -80,9 +93,12 @@ function ConvertPanel() {
             <Card>
               <Card.Body>
                 <Card.Title className="text-dark">Currency rate</Card.Title>
-                {state.amount && state.currencyFrom && state.currencyTo ? (
+                {state.amount &&
+                state.currencyFrom &&
+                state.currencyTo &&
+                state.convertedAmount ? (
                   <Card.Text>
-                    {`${state.amount} ${state.currencyFrom} = ${convertedAmount} ${state.currencyTo}`}
+                    {`${state.amount} ${state.currencyFrom} = ${state.convertedAmount} ${state.currencyTo}`}
                   </Card.Text>
                 ) : null}
               </Card.Body>
@@ -132,7 +148,7 @@ function ConvertPanel() {
             </div>
 
             <div className="d-flex justify-content-center text-center my-3 ">
-              <Button className="w-100" variant="dark">
+              <Button className="w-100" variant="dark" onClick={onConvert}>
                 Convert
               </Button>
             </div>
