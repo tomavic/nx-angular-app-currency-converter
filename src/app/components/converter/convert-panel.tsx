@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Button,
   Card,
@@ -8,12 +8,56 @@ import {
   Form,
   Row,
 } from 'react-bootstrap';
+import { getSymbols } from 'src/app/api/currency.api';
+import { useCurrencyContext } from 'src/app/context/currency.context';
 
 function ConvertPanel() {
-  const amount = '28';
-  const currencyFrom = 'EUR';
-  const currencyTo = 'EGP';
-  const convertedAmount = '320.56';
+  const amount = 28;
+  const convertedAmount = 656565;
+
+  const { state, dispatch } = useCurrencyContext();
+
+  const onSelectCurrencyFrom = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    dispatch({
+      type: 'SET_CURRENCY_FROM',
+      payload: value,
+    });
+  };
+
+  const onSelectCurrencyTo = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    dispatch({
+      type: 'SET_CURRENCY_TO',
+      payload: value,
+    });
+  };
+
+  const onAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    dispatch({
+      type: 'SET_AMOUNT',
+      payload: value,
+    });
+  };
+
+  useEffect(() => {
+    getSymbols()
+      .then((res) => {
+        dispatch({
+          type: 'SET_CURRENCY_LIST_FROM',
+          payload: res,
+        });
+
+        dispatch({
+          type: 'SET_CURRENCY_LIST_TO',
+          payload: res,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 
   return (
     <section className="sticky-top bg-white py-5" style={{ top: '79px' }}>
@@ -27,6 +71,7 @@ function ConvertPanel() {
                 placeholder="Enter amount"
                 id="amountId"
                 className="w-100"
+                onChange={onAmountChange}
                 style={{ maxWidth: '280px' }}
                 type="text"
                 aria-label="Dollar amount (with dot and two decimal places)"
@@ -35,9 +80,11 @@ function ConvertPanel() {
             <Card>
               <Card.Body>
                 <Card.Title className="text-dark">Currency rate</Card.Title>
-                <Card.Text>
-                  {`${amount} ${currencyFrom} = ${convertedAmount} ${currencyTo}`}
-                </Card.Text>
+                {state.amount && state.currencyFrom && state.currencyTo ? (
+                  <Card.Text>
+                    {`${state.amount} ${state.currencyFrom} = ${convertedAmount} ${state.currencyTo}`}
+                  </Card.Text>
+                ) : null}
               </Card.Body>
             </Card>
           </Col>
@@ -46,11 +93,16 @@ function ConvertPanel() {
             <div className="d-flex justify-content-between gap-2">
               <div className="w-100">
                 <Form.Label>From</Form.Label>
-                <Form.Select aria-label="Default select example">
-                  <option>-</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                <Form.Select
+                  onChange={onSelectCurrencyFrom}
+                  aria-label="Default select example"
+                >
+                  <option value="">-</option>
+                  {state.currencyListFrom.map((item, idx) => (
+                    <option value={item.value} key={idx}>
+                      {item.name}
+                    </option>
+                  ))}
                 </Form.Select>
               </div>
               <div className="align-self-end text-center">
@@ -65,11 +117,16 @@ function ConvertPanel() {
               </div>
               <div className="w-100">
                 <Form.Label>To</Form.Label>
-                <Form.Select aria-label="Default select example">
-                  <option>-</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                <Form.Select
+                  onChange={onSelectCurrencyTo}
+                  aria-label="Default select example"
+                >
+                  <option value="">-</option>
+                  {state.currencyListTo.map((item, idx) => (
+                    <option value={item.value} key={idx}>
+                      {item.name}
+                    </option>
+                  ))}
                 </Form.Select>
               </div>
             </div>
