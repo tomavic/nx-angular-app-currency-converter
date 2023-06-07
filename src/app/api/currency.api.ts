@@ -1,6 +1,7 @@
 import { Currency } from '../models/currency.model';
 
 const api = 'http://data.fixer.io/api';
+const serviceId = 'access_key=c2d005d3b3b37d6b85df951882186ec3';
 const headers = {
   Accept: 'application/json',
 };
@@ -39,7 +40,6 @@ interface LatestRateResponse {
 }
 
 export const getSymbols = async (): Promise<Currency[]> => {
-  const serviceId = 'access_key=c2d005d3b3b37d6b85df951882186ec3';
   const res = await fetch(`${api}/symbols?${serviceId}`, { headers });
   const data = await (res.json() as Promise<GetCurrencySymbolsResponse>);
   return Object.entries(data.symbols).map(([key, value]) => ({
@@ -53,7 +53,6 @@ export const convert = async (
   to: string,
   amount: number
 ): Promise<ConvertResponse> => {
-  const serviceId = 'access_key=c2d005d3b3b37d6b85df951882186ec3';
   const fromId = `from=${from}`;
   const toId = `to=${to}`;
   const amountId = `amount=${amount}`;
@@ -68,13 +67,11 @@ export const convert = async (
 export const getLatestNine = async (
   base: string
 ): Promise<LatestRateResponse> => {
-  const serviceId = 'access_key=c2d005d3b3b37d6b85df951882186ec3';
   const baseId = `base=${base}`;
-  const symbols = 'GBP,JPY,EUR';
-  const res = await fetch(
-    `${api}/latest?${serviceId}?${baseId}?symbols=${symbols}`,
-    { headers }
-  );
+  const symbols = 'symbols=GBP,JPY,EUR';
+  const res = await fetch(`${api}/latest?${serviceId}&${baseId}&${symbols}`, {
+    headers,
+  });
   const data = await (res.json() as Promise<LatestRateResponse>);
   return data;
 };

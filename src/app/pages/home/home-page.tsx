@@ -7,7 +7,7 @@ export default function HomePage() {
   const { state, dispatch } = useCurrencyContext();
 
   useEffect(() => {
-    getLatestNine(state.currencyFrom)
+    getLatestNine('EGP')
       .then((res) => {
         console.log(res);
       })
