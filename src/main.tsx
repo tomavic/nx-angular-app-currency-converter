@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './app/app';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { CurrencyProvider } from './app/context/currency.context';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,7 +13,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <CurrencyProvider>
+        <App />
+      </CurrencyProvider>
     </BrowserRouter>
   </StrictMode>
 );
