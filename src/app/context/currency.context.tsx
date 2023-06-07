@@ -16,7 +16,7 @@ const INITIAL_STATE: AppState = {
   currencyListFrom: [],
   currencyListTo: [],
   amount: null,
-  currencyFrom: '',
+  currencyFrom: 'USD',
   currencyTo: '',
   convertedAmount: null,
 };

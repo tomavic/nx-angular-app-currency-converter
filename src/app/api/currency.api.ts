@@ -26,6 +26,18 @@ interface ConvertResponse {
   result: string;
 }
 
+interface LatestRateResponse {
+  success: true;
+  timestamp: 1519296206;
+  base: 'USD';
+  date: '2023-06-06';
+  rates: {
+    GBP: 0.72007;
+    JPY: 107.346001;
+    EUR: 0.813399;
+  };
+}
+
 export const getSymbols = async (): Promise<Currency[]> => {
   const serviceId = 'access_key=c2d005d3b3b37d6b85df951882186ec3';
   const res = await fetch(`${api}/symbols?${serviceId}`, { headers });
@@ -54,12 +66,15 @@ export const convert = async (
 };
 
 export const getLatestNine = async (
-  base?: string,
-  symbols?: Array<string>
-): Promise<unknown[]> => {
+  base: string
+): Promise<LatestRateResponse> => {
   const serviceId = 'access_key=c2d005d3b3b37d6b85df951882186ec3';
   const baseId = `base=${base}`;
-  const res = await fetch(`${api}/latest?${serviceId}?${baseId}`, { headers });
-  const data = await (res.json() as Promise<{ currency: unknown[] }>);
-  return data.currency;
+  const symbols = 'GBP,JPY,EUR';
+  const res = await fetch(
+    `${api}/latest?${serviceId}?${baseId}?symbols=${symbols}`,
+    { headers }
+  );
+  const data = await (res.json() as Promise<LatestRateResponse>);
+  return data;
 };
